@@ -1,0 +1,6 @@
+[submodule "server"]
+	path = server
+	url = git@github.com:serereg/nic_srv
+[submodule "opc"]
+	path = opc
+	url = git@github.com:serereg/nic_cl

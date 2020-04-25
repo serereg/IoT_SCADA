@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:latest
+    network_mode: bridge
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:5432
+    # volumes:
+    #   - ./database:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    network_mode: bridge
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - ./redis:/data
+
+  server:
+    build: ./server
+    image: server
+    network_mode: bridge
+    environment:
+      DB_HOST: ${DB_LINK}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_LINK}
+      REDIS_PORT: ${REDIS_PORT}
+    ports:
+      - 80:80
+    depends_on:
+      - database
+      - redis
+    links:
+      - database:${DB_LINK}
+      - redis:${REDIS_LINK}
+
+  # opc:
+  #   build: ./opc
+  #   network_mode: host
+  #   depends_on:
+  #     - server
